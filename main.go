@@ -47,25 +47,33 @@ func main() {
 			log.Fatal("Invalid align flag. Expected format: --align=left|right|center|justify")
 		}
 
-		alignment = strings.TrimPrefix(arg, "--align=")
+		alignment = strings.ToLower(strings.TrimPrefix(arg, "--align="))
 		text = os.Args[2]
 		banner = os.Args[3] + ".txt"
 	}
 
-	_ = alignment // used later for justify
+	// get terminal width for alignment calculations
+	total_width := art_justify.GetTerminalWidth()
+	if len(text) > total_width {
+		log.Fatal("Terminal size exceeded")
+	}
 
 	// Generate ASCII
 	result := art_justify.AsciiArt(text, banner)
 
-	// Print correctly
-	for _, block := range result {
-		if len(block) == 1 && block[0] == "" {
-			fmt.Println()
-			continue
-		}
+	// Applying the alignment
+	switch alignment {
+	case "left":
+		art_justify.LeftAlign(result)
+	case "right":
+		art_justify.RightAlign(result, total_width)
+	case "center":
+		art_justify.CenterAlign(result, total_width)
+	case "justify" :
+		art_justify.JustifyAlign(result, total_width)
 
-		for _, row := range block {
-			fmt.Println(row)
-		}
+	default:
+		(log.Fatal("error"))
 	}
+
 }
