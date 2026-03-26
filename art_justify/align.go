@@ -20,19 +20,29 @@ func LeftAlign(arts [][]string) {
 func RightAlign(arts [][]string, total_width int) {
 	for row := 0; row < 8; row++ {
 		char_width := 0
-		for _, char := range arts {
+		for i, char := range arts {
 			char_width += len(char[row])
+
+			// add 1 space between words (except last word)
+			if i < len(arts)-1 {
+				char_width +=1
+			}
 		}
 
 		padding := total_width - char_width
 		if padding < 0 {
 			padding = 0
 		}
-		lines := ""
-		for _, char := range arts {
-			lines += char[row] + " "
+
+		var line strings.Builder
+		for i, char := range arts {
+			line.WriteString(char[row])
+
+			if i < len(arts)-1 {
+				line.WriteString(" ")
+			}
 		}
-		fmt.Println(strings.Repeat(" ", padding) + lines)
+		fmt.Println(strings.Repeat(" ", padding) + line.String())
 	}
 }
 
@@ -40,18 +50,26 @@ func RightAlign(arts [][]string, total_width int) {
 func CenterAlign(arts [][]string, total_width int) {
 	for row := 0; row < 8; row++ {
 		char_width := 0
-		for _, char := range arts {
+		for i, char := range arts {
 			char_width += len(char[row])
+
+			if i < len(arts)-1 {
+				char_width =+1
+			}
 		}
 		padding := (total_width - char_width) / 2
 		if padding < 0 {
 			padding = 0
 		}
-		lines := ""
-		for _, char := range arts {
-			lines += char[row] + " "
+		var line strings.Builder
+		for i, char := range arts {
+			line.WriteString(char[row])
+
+			if i < len(arts)-1 {
+				line.WriteString(" ")
+			}
 		}
-		fmt.Println(strings.Repeat(" ", padding) + lines)
+		fmt.Println(strings.Repeat(" ", padding) + line.String())
 	}
 }
 
@@ -62,9 +80,9 @@ func JustifyAlign(arts [][]string, total_width int) {
 
 	// Calculate character width
 	char_width := 0
-	for _, char := range arts {
-		if len(char) > 0 {
-			char_width += len(char[0])
+	for _, word := range arts {
+		if len(word) > 0 {
+			char_width += len(word[0])
 		}
 	}
 
@@ -89,8 +107,8 @@ func JustifyAlign(arts [][]string, total_width int) {
 	for row := 0; row < 8; row++ {
 		var lines strings.Builder
 
-		for i, char := range arts {
-			lines.WriteString(char[row])
+		for i, word := range arts {
+			lines.WriteString(word[row])
 
 			if i < gaps {
 				space := baseSpace + 1
