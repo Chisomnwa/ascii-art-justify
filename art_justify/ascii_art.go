@@ -41,7 +41,7 @@ func AsciiArt(text, banner string) [][]string {
 		// split line into words
 		// Helps in horizontal layout and removes extra spacing
 		// Because we will control the spaces manually
-		words := strings.Fields(line)
+		words := strings.Fields(line) // Complete text stilled stord as a s
 
 		for _, word := range words {
 			rows := make([]string, 8)
