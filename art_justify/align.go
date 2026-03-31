@@ -54,7 +54,7 @@ func CenterAlign(arts [][]string, total_width int) {
 			char_width += len(char[row])
 
 			if i < len(arts)-1 {
-				char_width =+1
+				char_width +=1
 			}
 		}
 		padding := (total_width - char_width) / 2
