@@ -1,7 +1,6 @@
 package art_justify
 
 import (
-	"log"
 	"os"
 	"os/exec"
 	"strconv"
@@ -9,23 +8,26 @@ import (
 )
 
 // get terminal width of the current terminal
-func GetTerminalWidth() int {
+func GetTerminalWidth() int{
 	cmd := exec.Command("stty", "size")
-	cmd.Stdin = os.Stdin
+	cmd.Stdin = os.Stdin // attach command to current terminal
 
 	output, err := cmd.Output()
 	if err != nil {
-		log.Print(err.Error())
-		return 80 // Default size
+		return 80 //fallback width(default)
 	}
 
-	height_Width := strings.Fields(string(output))
-
-	width, err := strconv.Atoi(height_Width[1])
-	if err != nil {
-		log.Print(err.Error())
+	// split "rows columns"
+	parts := strings.Fields((string(output)))
+	if len(parts) != 2 {
 		return 80
 	}
 
-	return width
+	//  converting width to integer
+	total_width, err := strconv.Atoi(parts[1])
+	if err != nil {
+		return 80
+	}
+
+	return total_width
 }
