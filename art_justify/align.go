@@ -3,121 +3,86 @@ package art_justify
 import (
 	"fmt"
 	"strings"
+	 "os"
 )
 
-// LeftAlign prints ASCII art exactly as it is with no extra spacing
-func LeftAlign(arts [][]string) {
-	for row := 0; row < 8; row++ {
-		lines := ""
-		for _, char := range arts {
-			lines += (char[row]) + " "
-		}
-		fmt.Println(lines)
-	}
+func LeftAlign(text_art string) {
+	fmt.Print(text_art)
+
 }
 
-// RightAlign shifts the ASCII arts to the right by adding spaces to the left
-func RightAlign(arts [][]string, total_width int) {
-	for row := 0; row < 8; row++ {
-		char_width := 0
-		for i, char := range arts {
-			char_width += len(char[row])
+func RightAlign(text_art string, width int) {
+	lines := strings.Split(strings.TrimRight(text_art, "\n"), "\n")
 
-			// add 1 space between words (except last word)
-			if i < len(arts)-1 {
-				char_width +=1
-			}
-		}
-
-		padding := total_width - char_width
+	for _, line := range lines {
+		padding := (width - len(line))
 		if padding < 0 {
 			padding = 0
 		}
-
-		var line strings.Builder
-		for i, char := range arts {
-			line.WriteString(char[row])
-
-			if i < len(arts)-1 {
-				line.WriteString(" ")
-			}
-		}
-		fmt.Println(strings.Repeat(" ", padding) + line.String())
+		fmt.Printf("%s%s\n",strings.Repeat(" ", padding), line)
 	}
 }
 
-// CenterAlign places the ASCII art in the center of the terminal width
-func CenterAlign(arts [][]string, total_width int) {
-	for row := 0; row < 8; row++ {
-		char_width := 0
-		for i, char := range arts {
-			char_width += len(char[row])
+func CenterAlign(text_art string, width int) {
+	lines := strings.Split(strings.TrimRight(text_art, "\n"), "\n")
 
-			if i < len(arts)-1 {
-				char_width +=1
-			}
-		}
-		padding := (total_width - char_width) / 2
+	for _, line := range lines {
+		padding := (width - len(line))/2
 		if padding < 0 {
 			padding = 0
 		}
-		var line strings.Builder
-		for i, char := range arts {
-			line.WriteString(char[row])
-
-			if i < len(arts)-1 {
-				line.WriteString(" ")
-			}
-		}
-		fmt.Println(strings.Repeat(" ", padding) + line.String())
+		fmt.Printf("%s%s\n",strings.Repeat(" ", padding), line)
 	}
 }
 
-// Justify places the spaces evenly between the ASCII art in the terminal
-func JustifyAlign(arts [][]string, total_width int) {
-	numWords := len(arts)
-	gaps := numWords - 1
+func JustifyAlign(text_art string, text string, width int, banner string) {
+	lines := strings.Split(strings.TrimRight(text_art, "\n"), "\n")
+	words := strings.Fields(text)
+	gaps := len(words) - 1
 
-	// Calculate character width
-	char_width := 0
-	for _, word := range arts {
-		if len(word) > 0 {
-			char_width += len(word[0])
-		}
-	}
-
-	// If only one word
 	if gaps <= 0 {
-		for i := 0; i < 8; i++ {
-			fmt.Println(arts[0][i])
-		}
+		fmt.Println(text_art)
 		return
 	}
 
-	// Calculate spacing
-	totalSpace := total_width - char_width - gaps
-	if totalSpace < 0 {
-		totalSpace = 0
+	artWidth := 0
+	for _, line := range lines {
+		if len(line) > artWidth {
+			artWidth = len(line)
+		}
 	}
 
-	baseSpace := totalSpace / gaps
-	extraSpace := totalSpace % gaps
+	padding := width - artWidth
+	baseSpace := padding / gaps
+	remainder := padding % gaps
 
-	// Build Output
-	for row := 0; row < 8; row++ {
-		var lines strings.Builder
+	spaceWidth := getSpaceWidth(banner)
+	spaceSep := strings.Repeat(" ", spaceWidth) // the actual gap between words
 
-		for i, word := range arts {
-			lines.WriteString(word[row])
-
-			if i < gaps {
-				space := baseSpace + 1
-				if i < extraSpace {
-					space++
+	for _, line := range lines {
+		parts := strings.Split(line, spaceSep)
+		result := ""
+		gapIndex := 0
+		for i, part := range parts {
+			result += part
+			if i < len(parts)-1 {
+				extra := 0
+				if gapIndex < remainder {
+					extra = 1
 				}
-				lines.WriteString(strings.Repeat(" ", space))
+				result += strings.Repeat(" ", spaceWidth+baseSpace+extra)
+				gapIndex++
 			}
 		}
-		fmt.Println(lines.String())
+		fmt.Println(result)
 	}
+}
+
+func getSpaceWidth(banner string) int {
+	content, err := os.ReadFile(banner)
+	if err != nil {
+		return 8 // default fallback
+	}
+	arts := strings.Split(string(content), "\n")
+	return len(arts[1]) // space is ASCII 32, index 0 in the banner, row 1 = arts[1]
 }
